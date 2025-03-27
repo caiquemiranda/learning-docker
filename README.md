@@ -7,8 +7,9 @@ Este repositório serve como um hub de conhecimento sobre Docker, contendo exemp
 1. [Fundamentos do Docker](#fundamentos-do-docker)
 2. [Scripts Úteis](#scripts-úteis)
 3. [Docker Compose](#docker-compose)
-4. [Tutoriais](#tutoriais)
-5. [Comandos Básicos](#comandos-básicos)
+4. [Projetos de Exemplo](#projetos-de-exemplo)
+5. [Tutoriais](#tutoriais)
+6. [Comandos Básicos](#comandos-básicos)
 
 ## Fundamentos do Docker
 
@@ -44,9 +45,15 @@ Docker é uma plataforma de containerização que permite empacotar aplicações
 
 Docker Compose é uma ferramenta para definir e executar aplicações multi-container. Ele usa um arquivo YAML para configurar os serviços da aplicação.
 
+### Conceitos do Docker Compose
+- **Services**: Define os containers que compõem a aplicação
+- **Networks**: Configura a comunicação entre containers
+- **Volumes**: Gerencia o armazenamento persistente
+- **Environment Variables**: Define variáveis de ambiente
+
 ### Exemplo de docker-compose.yml
 ```yaml
-version: '3'
+version: '3.8'
 services:
   web:
     build: .
@@ -57,6 +64,55 @@ services:
     environment:
       POSTGRES_DB: mydb
 ```
+
+### Comandos Docker Compose
+```bash
+# Iniciar serviços
+docker-compose up
+
+# Parar serviços
+docker-compose down
+
+# Reconstruir imagens
+docker-compose build
+
+# Ver logs
+docker-compose logs
+```
+
+## Projetos de Exemplo
+
+Este repositório contém vários projetos de exemplo para demonstrar diferentes aspectos do Docker:
+
+### 1. FastAPI Básico
+- Localização: `app01-docker-basico-python-FastAPI`
+- Descrição: API REST básica com FastAPI
+- Nível: Iniciante
+- Tecnologias: Python, FastAPI, Docker
+
+### 2. FastAPI com React
+- Localização: `app02-docker-FastAPI-React`
+- Descrição: Aplicação Todo List com FastAPI e React
+- Nível: Intermediário
+- Tecnologias: Python, FastAPI, React, Docker Compose
+
+### 3. FastAPI com React e PostgreSQL
+- Localização: `app03-docker-FastAPI-React-Postgress`
+- Descrição: Aplicação completa com banco de dados
+- Nível: Avançado
+- Tecnologias: Python, FastAPI, React, PostgreSQL, Docker Compose
+
+### 4. Node.js com React e PostgreSQL
+- Localização: `app04-docker-node-React-postegress`
+- Descrição: Aplicação com Node.js no backend
+- Nível: Avançado
+- Tecnologias: Node.js, React, PostgreSQL, Docker Compose
+
+### 5. Go com React e PostgreSQL
+- Localização: `app05-docker-go-react-postgress`
+- Descrição: Aplicação com Go no backend
+- Nível: Avançado
+- Tecnologias: Go, React, PostgreSQL, Docker Compose
 
 ## Tutoriais
 
@@ -97,7 +153,7 @@ docker rm container_id
 
 ## 🚀 Próximos Passos
 
-1. Explore os exemplos práticos na pasta `examples/`
+1. Explore os exemplos práticos nos diretórios `app01` até `app05`
 2. Experimente os scripts disponíveis
 3. Crie seus próprios containers e imagens
 4. Aprenda sobre Docker Compose para orquestração
