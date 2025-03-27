@@ -1,0 +1,100 @@
+.App {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+
+input[type="text"],
+textarea {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+
+.todo-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    flex: 1;
+}
+
+.todo-text {
+    flex: 1;
+}
+
+.todo-text span {
+    font-size: 16px;
+    color: #333;
+}
+
+.description {
+    margin: 5px 0 0;
+    font-size: 14px;
+    color: #666;
+}
+
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 3px;
+}
+
+button:last-child {
+    background-color: #dc3545;
+    margin-left: 10px;
+}
+
+button:last-child:hover {
+    background-color: #c82333;
+}
