@@ -2,9 +2,11 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
 )
@@ -19,21 +21,33 @@ type Todo struct {
 var db *sql.DB
 
 func initDB() {
-	connStr := "postgres://postgres:postgres@db:5432/todos?sslmode=disable"
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbname := os.Getenv("DB_NAME")
+
+	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname)
+
 	var err error
-	db, err = sql.Open("postgres", connStr)
+	db, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Criar tabela se não existir
+	err = db.Ping()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	_, err = db.Exec(`
 		CREATE TABLE IF NOT EXISTS todos (
 			id SERIAL PRIMARY KEY,
 			title TEXT NOT NULL,
 			description TEXT,
 			completed BOOLEAN DEFAULT FALSE
-		);
+		)
 	`)
 	if err != nil {
 		log.Fatal(err)
@@ -41,7 +55,7 @@ func initDB() {
 }
 
 func getTodos(c *gin.Context) {
-	rows, err := db.Query("SELECT id, title, description, completed FROM todos ORDER BY id")
+	rows, err := db.Query("SELECT id, title, description, completed FROM todos")
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -70,9 +84,9 @@ func createTodo(c *gin.Context) {
 	}
 
 	err := db.QueryRow(
-		"INSERT INTO todos (title, description) VALUES ($1, $2) RETURNING id, completed",
-		todo.Title, todo.Description,
-	).Scan(&todo.ID, &todo.Completed)
+		"INSERT INTO todos (title, description, completed) VALUES ($1, $2, $3) RETURNING id",
+		todo.Title, todo.Description, todo.Completed,
+	).Scan(&todo.ID)
 
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -90,40 +104,29 @@ func updateTodo(c *gin.Context) {
 		return
 	}
 
-	result, err := db.Exec(
+	_, err := db.Exec(
 		"UPDATE todos SET title = $1, description = $2, completed = $3 WHERE id = $4",
 		todo.Title, todo.Description, todo.Completed, id,
 	)
+
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
-	rows, _ := result.RowsAffected()
-	if rows == 0 {
-		c.JSON(404, gin.H{"error": "Todo não encontrado"})
-		return
-	}
-
-	c.JSON(200, gin.H{"message": "Todo atualizado com sucesso"})
+	c.JSON(200, todo)
 }
 
 func deleteTodo(c *gin.Context) {
 	id := c.Param("id")
 
-	result, err := db.Exec("DELETE FROM todos WHERE id = $1", id)
+	_, err := db.Exec("DELETE FROM todos WHERE id = $1", id)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
-	rows, _ := result.RowsAffected()
-	if rows == 0 {
-		c.JSON(404, gin.H{"error": "Todo não encontrado"})
-		return
-	}
-
-	c.JSON(200, gin.H{"message": "Todo removido com sucesso"})
+	c.JSON(200, gin.H{"message": "Todo deleted successfully"})
 }
 
 func main() {
@@ -131,18 +134,14 @@ func main() {
 
 	r := gin.Default()
 
-	// Configuração CORS
-	r.Use(func(c *gin.Context) {
-		c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		if c.Request.Method == "OPTIONS" {
-			c.AbortWithStatus(204)
-			return
-		}
-		c.Next()
-	})
+	// Configuração do CORS
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost:3000"}
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	config.AllowHeaders = []string{"Origin", "Content-Type"}
+	r.Use(cors.New(config))
 
+	// Rotas
 	r.GET("/todos", getTodos)
 	r.POST("/todos", createTodo)
 	r.PUT("/todos/:id", updateTodo)
